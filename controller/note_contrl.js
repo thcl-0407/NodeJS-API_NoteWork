@@ -25,8 +25,9 @@ async function AddUser(User, CallBack){
         const result = await request
         .input('first_name', mssql.mssql.NVarChar, User.firstName)
         .input('last_name', mssql.mssql.NVarChar, User.lastName)
+        .input('email', mssql.mssql.VarChar, User.email)
         .input('password', mssql.mssql.VarChar, bcrypt.hashSync(User.password, bcrypt.genSaltSync(10)))
-        .query('INSERT INTO [NOTE_WORK].[dbo].[User](first_name, last_name, password) VALUES (@first_name, @last_name, @password)')
+        .query('INSERT INTO [NOTE_WORK].[dbo].[User](first_name, last_name, email, password) VALUES (@first_name, @last_name, @email, @password)')
         if(result.rowsAffected[0] == 1){
             CallBack(true)
         }else{
@@ -42,12 +43,16 @@ async function Login(User, CallBack){
     try{
         const request = mssql.pool.request()
         const result = await request
-        .input('first_name', mssql.mssql.NVarChar, User.firstName)
-        .input('last_name', mssql.mssql.NVarChar, User.lastName)
-        .input('password', mssql.mssql.VarChar, bcrypt.hashSync(User.password, bcrypt.genSaltSync(10)))
-        .query('INSERT INTO [NOTE_WORK].[dbo].[User](first_name, last_name, password) VALUES (@first_name, @last_name, @password)')
+        .input('email', mssql.mssql.VarChar, User.email)
+        .query('SELECT * FROM [NOTE_WORK].[dbo].[User] WHERE email = @email')
         if(result.rowsAffected[0] == 1){
-            CallBack(true)
+            const isMatch = bcrypt.compareSync(User.password, result.recordset[0].password);
+
+            if(isMatch){
+                CallBack(true)
+            }else{
+                CallBack(false)
+            }
         }else{
             CallBack(false)
         }
@@ -58,5 +63,6 @@ async function Login(User, CallBack){
 
 module.exports = {
     GetUserbyId,
-    AddUser
+    AddUser,
+    Login
 }

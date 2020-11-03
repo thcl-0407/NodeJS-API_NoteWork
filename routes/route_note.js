@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser  = require('body-parser')
 const noteController = require('../controller/note_contrl.js')
+const { Login } = require('../controller/note_contrl.js')
 const route = express.Router()
 route.use(bodyParser.json())
 
@@ -25,6 +26,7 @@ module.exports = {
         let User = {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
+            email: req.body.email,
             password: req.body.password
         }
 
@@ -41,7 +43,26 @@ module.exports = {
                 })
             } 
         })
-    })
+    }),
 
-    
+    Login: route.post('/login', (req,res)=>{
+        let User = {
+            email: req.body.email,
+            password: req.body.password
+        }
+
+        noteController.Login(User, (result)=>{
+            if(!result){
+                res.send({
+                    success: 0,
+                    message: "Đăng Nhập Thất Bại"
+                })
+            }else{
+                res.send({
+                    success: 1,
+                    message: "Đăng Nhập Thành Công"
+                })
+            } 
+        })
+    })
 }
