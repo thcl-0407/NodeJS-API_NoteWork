@@ -24,8 +24,8 @@ module.exports = {
 
     AddUser: route.post('/add', (req,res)=>{
         let User = {
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
+            firstName: req.body.first_name,
+            lastName: req.body.last_name,
             email: req.body.email,
             password: req.body.password
         }
