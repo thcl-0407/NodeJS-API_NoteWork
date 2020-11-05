@@ -1,4 +1,4 @@
-const PORT_RUNNING = 800
+const PORT_RUNNING = 3000
 const express = require('express')
 const route = require('./routes/route_note.js')
 const app = express()
