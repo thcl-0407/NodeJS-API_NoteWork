@@ -37,7 +37,7 @@ async function GetUserbyEmail(Email, CallBack){
 
 async function AddUser(User, CallBack){
     await GetUserbyEmail(User.email, async (result, data)=>{
-        if(!result){
+        if(result == false){
             await mssql.poolConnection
             try{
                 const request = mssql.pool.request()
