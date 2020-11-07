@@ -64,5 +64,48 @@ module.exports = {
                 })
             } 
         })
-    })
+    }),
+
+    UpdatePassword: route.post('/change/pass', (req,res)=>{
+        let User = {
+            email: req.body.email,
+            password: req.body.password
+        }
+
+        noteController.UpdatePassword(User, (result)=>{
+            if(!result){
+                res.send({
+                    success: 0,
+                    message: "Đổi Mật Khẩu Thất Bại"
+                })
+            }else{
+                res.send({
+                    success: 1,
+                    message: "Đổi Mật Khẩu Thành Công"
+                })
+            } 
+        })
+    }),
+
+    UpdateUser: route.post('/change/user', (req,res)=>{
+        let User = {
+            firstName: req.body.first_name,
+            lastName: req.body.last_name,
+            email: req.body.email
+        }
+
+        noteController.UpdateUser(User, (result)=>{
+            if(!result){
+                res.send({
+                    success: 0,
+                    message: "Cập Nhật Thất Bại"
+                })
+            }else{
+                res.send({
+                    success: 1,
+                    message: "Cập Nhật Thành Công"
+                })
+            } 
+        })
+    }),
 }

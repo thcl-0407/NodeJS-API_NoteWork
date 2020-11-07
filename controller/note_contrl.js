@@ -84,8 +84,59 @@ async function Login(User, CallBack){
     }
 }
 
+async function UpdatePassword(User, CallBack){
+    await GetUserbyEmail(User.email, async (result, data)=>{
+        if(result == true){
+            await mssql.poolConnection
+            try{
+                const request = mssql.pool.request()
+                const result = await request
+                .input('email', mssql.mssql.VarChar, User.email)
+                .input('password', mssql.mssql.VarChar, bcrypt.hashSync(User.password, bcrypt.genSaltSync(10)))
+                .query('UPDATE [NOTE_WORK].[dbo].[User] SET password = @password WHERE email = @email')
+                if(result.rowsAffected[0] == 1){
+                    CallBack(true)
+                }else{
+                    CallBack(false)
+                }
+            }catch{
+                CallBack(false)
+            }
+        }else{
+            CallBack(false)
+        }
+    })
+}
+
+async function UpdateUser(User, CallBack){
+    await GetUserbyEmail(User.email, async (result, data)=>{
+        if(result == true){
+            await mssql.poolConnection
+            try{
+                const request = mssql.pool.request()
+                const result = await request
+                .input('first_name', mssql.mssql.NVarChar, User.firstName)
+                .input('last_name', mssql.mssql.NVarChar, User.lastName)
+                .input('email', mssql.mssql.VarChar, User.email)
+                .query('UPDATE [NOTE_WORK].[dbo].[User] SET first_name = @first_name, last_name = @last_name WHERE email = @email')
+                if(result.rowsAffected[0] == 1){
+                    CallBack(true)
+                }else{
+                    CallBack(false)
+                }
+            }catch{
+                CallBack(false)
+            }
+        }else{
+            CallBack(false)
+        }
+    })
+}
+
 module.exports = {
     GetUserbyId,
     AddUser,
-    Login
+    Login,
+    UpdatePassword, 
+    UpdateUser
 }
