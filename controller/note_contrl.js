@@ -137,6 +137,7 @@ module.exports = {
     GetUserbyId,
     AddUser,
     Login,
+    GetUserbyEmail,
     UpdatePassword, 
     UpdateUser
 }
