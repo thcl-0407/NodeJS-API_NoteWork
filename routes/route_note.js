@@ -23,8 +23,8 @@ module.exports = {
     }),
 
     GetUserbyEmail: route.get('/email=:email', (req, res)=>{
-        noteController.GetUserbyEmail(req.params.email, (data)=>{
-            if(!data){
+        noteController.GetUserbyEmail(req.params.email, (result, data)=>{
+            if(!result){
                 res.send({
                     success: 0,
                     users: []
