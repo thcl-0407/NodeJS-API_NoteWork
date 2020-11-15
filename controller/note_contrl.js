@@ -133,11 +133,67 @@ async function UpdateUser(User, CallBack){
     })
 }
 
+async function AddNote(Note, CallBack){
+    await mssql.poolConnection
+    try{
+        const request = mssql.pool.request()
+        const result = await request
+        .input('title', mssql.mssql.NVarChar, Note.title)
+        .input('content_note', mssql.mssql.NVarChar, Note.content_note)
+        .input('user_id', mssql.mssql.VarChar, Note.user_id)
+        .query('INSERT INTO [NOTE_WORK].[dbo].[Notes](title, content_note, user_id) VALUES (@title, @content_note, @user_id)')
+        if(result.rowsAffected[0] == 1){
+           CallBack(true)
+        }else{
+            CallBack(false)
+        }
+    }catch{
+        CallBack(false)
+    }
+}
+
+async function GetNoteByUserId(id, CallBack){
+    await mssql.poolConnection
+    try{
+        const request = mssql.pool.request()
+        const result = await request
+        .input('user_id', mssql.mssql.VarChar, id)
+        .query('SELECT * FROM [NOTE_WORK].[dbo].[Notes] WHERE user_id = @user_id')
+        if(result.rowsAffected[0] > 0){
+            CallBack(true, result.recordset)
+        }else{
+            CallBack(false, null)
+        }
+    }catch{
+        CallBack(false, null)
+    }
+}
+
+async function GetNoteByTitle(key, CallBack){
+    await mssql.poolConnection
+    try{
+        const request = mssql.pool.request()
+        const result = await request
+        .input('title', mssql.mssql.VarChar, ("%" + key + "%"))
+        .query('SELECT * FROM [NOTE_WORK].[dbo].[Notes] WHERE title LIKE @title')
+        if(result.rowsAffected[0] > 0){
+            CallBack(true, result.recordset)
+        }else{
+            CallBack(false, null)
+        }
+    }catch{
+        CallBack(false, null)
+    }
+}
+
 module.exports = {
     GetUserbyId,
     AddUser,
     Login,
     GetUserbyEmail,
     UpdatePassword, 
-    UpdateUser
+    UpdateUser,
+    AddNote,
+    GetNoteByUserId,
+    GetNoteByTitle
 }

@@ -124,4 +124,58 @@ module.exports = {
             } 
         })
     }),
+
+    AddNote: route.post('/note/add', (req,res)=>{
+        let Note = {
+            title: req.body.title,
+            content_note: req.body.content_note,
+            user_id: req.body.user_id
+        }
+
+        noteController.AddNote(Note, (result)=>{
+            if(!result){
+                res.send({
+                    success: 0,
+                    message: "Thêm Thất Bại"
+                })
+            }else{
+                res.send({
+                    success: 1,
+                    message: "Thêm Thành Công"
+                })
+            } 
+        })
+    }),
+
+    GetNoteByUserId: route.get('/note/id=:id', (req, res)=>{
+        noteController.GetNoteByUserId(req.params.id, (result ,data)=>{
+            if(!result){
+                res.send({
+                    success: 0,
+                    notes: []
+                })
+            }else{
+                res.send({
+                    success: 1,
+                    notes: data
+                })
+            }
+        })
+    }),
+
+    GetNoteByUserTitle: route.get('/note/title=:title', (req, res)=>{
+        noteController.GetNoteByTitle(req.params.title, (result ,data)=>{
+            if(!result){
+                res.send({
+                    success: 0,
+                    notes: []
+                })
+            }else{
+                res.send({
+                    success: 1,
+                    notes: data
+                })
+            }
+        })
+    }),
 }
