@@ -169,6 +169,23 @@ async function GetNoteByUserId(id, CallBack){
     }
 }
 
+async function GetNoteByNoteId(id, CallBack){
+    await mssql.poolConnection
+    try{
+        const request = mssql.pool.request()
+        const result = await request
+        .input('note_id', mssql.mssql.VarChar, id)
+        .query('SELECT * FROM [NOTE_WORK].[dbo].[Notes] WHERE note_id = @note_id')
+        if(result.rowsAffected[0] > 0){
+            CallBack(true, result.recordset)
+        }else{
+            CallBack(false, null)
+        }
+    }catch{
+        CallBack(false, null)
+    }
+}
+
 async function GetNoteByTitle(key, CallBack){
     await mssql.poolConnection
     try{
@@ -186,6 +203,31 @@ async function GetNoteByTitle(key, CallBack){
     }
 }
 
+async function UpdateNote(Note, CallBack){
+    await GetNoteByNoteId(Note.note_id, async (result, data)=>{
+        if(result == true){
+            await mssql.poolConnection
+            try{
+                const request = mssql.pool.request()
+                const result = await request
+                .input('note_id', mssql.mssql.VarChar, Note.note_id)
+                .input('title', mssql.mssql.NVarChar, Note.title)
+                .input('content_note', mssql.mssql.NVarChar, Note.content_note)
+                .query('UPDATE [NOTE_WORK].[dbo].[Notes] SET title = @title, content_note = @content_note WHERE note_id = @note_id')
+                if(result.rowsAffected[0] == 1){
+                    CallBack(true)
+                }else{
+                    CallBack(false)
+                }
+            }catch{
+                CallBack(false)
+            }
+        }else{
+            CallBack(false)
+        }
+    })
+}
+
 module.exports = {
     GetUserbyId,
     AddUser,
@@ -195,5 +237,6 @@ module.exports = {
     UpdateUser,
     AddNote,
     GetNoteByUserId,
-    GetNoteByTitle
+    GetNoteByTitle,
+    UpdateNote
 }

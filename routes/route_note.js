@@ -178,4 +178,27 @@ module.exports = {
             }
         })
     }),
+
+    UpdateNote: route.post('/note/update', (req,res)=>{
+        let Note = {
+            note_id: req.body.note_id,
+            title: req.body.title,
+            content_note: req.body.content_note,
+            user_id: req.body.user_id
+        }
+
+        noteController.UpdateNote(Note, (result)=>{
+            if(!result){
+                res.send({
+                    success: 0,
+                    message: "Cập Nhật Thất Bại"
+                })
+            }else{
+                res.send({
+                    success: 1,
+                    message: "Cập Nhật Thành Công"
+                })
+            } 
+        })
+    }),
 }
