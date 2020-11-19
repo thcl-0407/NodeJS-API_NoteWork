@@ -228,6 +228,29 @@ async function UpdateNote(Note, CallBack){
     })
 }
 
+async function DeleteNoteByNoteID(id, CallBack){
+    await GetNoteByNoteId(id, async (result, data)=>{
+        if(result == true){
+            await mssql.poolConnection
+            try{
+                const request = mssql.pool.request()
+                const result = await request
+                .input('note_id', mssql.mssql.VarChar, id)
+                .query('DELETE FROM [NOTE_WORK].[dbo].[Notes] WHERE note_id = @note_id')
+                if(result.rowsAffected[0] == 1){
+                    CallBack(true)
+                }else{
+                    CallBack(false)
+                }
+            }catch{
+                CallBack(false)
+            }
+        }else{
+            CallBack(false)
+        }
+    })
+}
+
 module.exports = {
     GetUserbyId,
     AddUser,
@@ -238,5 +261,6 @@ module.exports = {
     AddNote,
     GetNoteByUserId,
     GetNoteByTitle,
-    UpdateNote
+    UpdateNote,
+    DeleteNoteByNoteID
 }

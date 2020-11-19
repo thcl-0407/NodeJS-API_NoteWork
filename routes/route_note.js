@@ -201,4 +201,22 @@ module.exports = {
             } 
         })
     }),
+
+    DeleteNoteByNoteID: route.post('/note/delete/id=:id', (req,res)=>{
+       let note_id = req.params.id;
+
+        noteController.DeleteNoteByNoteID(note_id, (result)=>{
+            if(!result){
+                res.send({
+                    success: 0,
+                    message: "Xoá Thất Bại"
+                })
+            }else{
+                res.send({
+                    success: 1,
+                    message: "Xoá Thành Công"
+                })
+            } 
+        })
+    }),
 }
