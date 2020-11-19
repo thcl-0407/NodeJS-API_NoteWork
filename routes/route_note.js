@@ -219,4 +219,67 @@ module.exports = {
             } 
         })
     }),
+
+    AddRemind: route.post('/remind/add', (req,res)=>{
+        let Remind = {
+            title: req.body.title,
+            content_remind: req.body.content_remind,
+            time_remind: req.body.time_remind,
+            date_remind: req.body.date_remind,
+            user_id: req.body.user_id
+        }
+
+        noteController.AddRemind(Remind, (result)=>{
+            if(!result){
+                res.send({
+                    success: 0,
+                    message: "Thêm Thất Bại"
+                })
+            }else{
+                res.send({
+                    success: 1,
+                    message: "Thêm Thành Công"
+                })
+            } 
+        })
+    }),
+
+    GetRemindByUserId: route.get('/remind/id=:id&date=:date', (req, res)=>{
+        let Remind = {
+            date_remind: req.params.date,
+            user_id: req.params.id
+        }
+
+        noteController.GetRemindByUserId(Remind, (result ,data)=>{
+            if(!result){
+                res.send({
+                    success: 0,
+                    reminds: []
+                })
+            }else{
+                res.send({
+                    success: 1,
+                    reminds: data
+                })
+            }
+        })
+    }),
+
+    DeleteRemindByRemindID: route.get('/remind/delete/id=:id', (req,res)=>{
+        let remind_id = req.params.id;
+ 
+         noteController.DeleteRemindByRemindID(remind_id, (result)=>{
+             if(!result){
+                 res.send({
+                     success: 0,
+                     message: "Xoá Thất Bại"
+                 })
+             }else{
+                 res.send({
+                     success: 1,
+                     message: "Xoá Thành Công"
+                 })
+             } 
+         })
+     }),
 }

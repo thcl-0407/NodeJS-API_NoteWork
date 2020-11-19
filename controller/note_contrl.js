@@ -1,6 +1,9 @@
 const mssql = require('../config/mssql_conf.js')
 const bcrypt = require('bcrypt')
- 
+const { DateTime } = require('mssql')
+
+//Control User Account
+
 async function GetUserbyId(Id, CallBack){
     await mssql.poolConnection
     try{
@@ -133,6 +136,8 @@ async function UpdateUser(User, CallBack){
     })
 }
 
+//Control Note
+
 async function AddNote(Note, CallBack){
     await mssql.poolConnection
     try{
@@ -251,6 +256,89 @@ async function DeleteNoteByNoteID(id, CallBack){
     })
 }
 
+//Control Remind
+async function AddRemind(Remind, CallBack){
+    await mssql.poolConnection
+    try{
+        const request = mssql.pool.request()
+        const result = await request
+        .input('title', mssql.mssql.NVarChar, Remind.title)
+        .input('content_remind', mssql.mssql.NVarChar, Remind.content_remind)
+        .input('time_remind', mssql.mssql.VarChar, Remind.time_remind)
+        .input('date_remind', mssql.mssql.VarChar, Remind.date_remind)
+        .input('user_id', mssql.mssql.VarChar, Remind.user_id)
+        .query('INSERT INTO [NOTE_WORK].[dbo].[Reminds](title, content_remind, time_remind, date_remind, user_id) VALUES (@title, @content_remind, @time_remind, @date_remind, @user_id)')
+        if(result.rowsAffected[0] == 1){
+           CallBack(true)
+        }else{
+            CallBack(false)
+        }
+    }catch{
+        CallBack(false)
+    }
+}
+
+async function GetRemindByUserId(Remind, CallBack){
+    await mssql.poolConnection
+    try{
+        const request = mssql.pool.request()
+        const result = await request
+        .input('user_id', mssql.mssql.VarChar, Remind.user_id )
+        .query("SELECT * FROM [NOTE_WORK].[dbo].[Reminds] WHERE user_id = @user_id and date_remind = '"+ Remind.date_remind +"'")
+        if(result.rowsAffected[0] > 0){
+            CallBack(true, result.recordset)
+        }else{
+            CallBack(false, null)
+        }
+    }catch{
+        CallBack(false, null)
+    }
+}
+
+async function UpdateRemind(Remind, CallBack){
+    await GetRemindByUserId(Remind, async (result, data)=>{
+        if(result == true){
+            await mssql.poolConnection
+            try{
+                const request = mssql.pool.request()
+                const result = await request
+                .input('remind_id', mssql.mssql.VarChar, Remind.remind_id)
+                .input('title', mssql.mssql.NVarChar, Remind.title)
+                .input('content_remind', mssql.mssql.NVarChar, Remind.content_remind)
+                .input('time_remind', mssql.mssql.VarChar, Remind.time_remind)
+                .input('date_remind', mssql.mssql.VarChar, Remind.date_remind)
+                .query('UPDATE [NOTE_WORK].[dbo].[Reminds] SET title = @title, content_remind = @content_remind, time_remind = @time_remind, date_remind = @date_remind WHERE remind_id = @remind_id')
+                if(result.rowsAffected[0] == 1){
+                    CallBack(true)
+                }else{
+                    CallBack(false)
+                }
+            }catch{
+                CallBack(false)
+            }
+        }else{
+            CallBack(false)
+        }
+    })
+}
+
+async function DeleteRemindByRemindID(id, CallBack){
+    await mssql.poolConnection
+    try{
+        const request = mssql.pool.request()
+        const result = await request
+        .input('remind_id', mssql.mssql.VarChar, id)
+        .query('DELETE FROM [NOTE_WORK].[dbo].[Reminds] WHERE remind_id = @remind_id')
+        if(result.rowsAffected[0] > 0){
+            CallBack(true, result.recordset)
+        }else{
+            CallBack(false, null)
+        }
+    }catch{
+        CallBack(false, null)
+    }
+}
+
 module.exports = {
     GetUserbyId,
     AddUser,
@@ -262,5 +350,9 @@ module.exports = {
     GetNoteByUserId,
     GetNoteByTitle,
     UpdateNote,
-    DeleteNoteByNoteID
+    DeleteNoteByNoteID,
+    AddRemind,
+    GetRemindByUserId,
+    UpdateRemind,
+    DeleteRemindByRemindID
 }
