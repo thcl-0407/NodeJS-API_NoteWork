@@ -295,8 +295,25 @@ async function GetRemindByUserId(Remind, CallBack){
     }
 }
 
+async function GetRemindByRemindID(Id, CallBack){
+    await mssql.poolConnection
+    try{
+        const request = mssql.pool.request()
+        const result = await request
+        .input('remind_id', mssql.mssql.VarChar, Id)
+        .query("SELECT * FROM [NOTE_WORK].[dbo].[Reminds] WHERE remind_id = @remind_id")
+        if(result.rowsAffected[0] > 0){
+            CallBack(true, result.recordset)
+        }else{
+            CallBack(false, null)
+        }
+    }catch{
+        CallBack(false, null)
+    }
+}
+
 async function UpdateRemind(Remind, CallBack){
-    await GetRemindByUserId(Remind, async (result, data)=>{
+    await GetRemindByRemindID(Remind.remind_id, async (result, data)=>{
         if(result == true){
             await mssql.poolConnection
             try{

@@ -244,6 +244,31 @@ module.exports = {
         })
     }),
 
+    UpdateRemind: route.post('/remind/update', (req,res)=>{
+        let Remind = {
+            remind_id: req.body.remind_id,
+            title: req.body.title,
+            content_remind: req.body.content_remind,
+            time_remind: req.body.time_remind,
+            date_remind: req.body.date_remind,
+            user_id: req.body.user_id
+        }
+
+        noteController.UpdateRemind(Remind, (result)=>{
+            if(!result){
+                res.send({
+                    success: 0,
+                    message: "Cập Nhật Thất Bại"
+                })
+            }else{
+                res.send({
+                    success: 1,
+                    message: "Cập Nhật Thành Công"
+                })
+            } 
+        })
+    }),
+
     GetRemindByUserId: route.get('/remind/id=:id&date=:date', (req, res)=>{
         let Remind = {
             date_remind: req.params.date,
