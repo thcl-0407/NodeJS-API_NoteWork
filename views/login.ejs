@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Imposter System</title>
+    <style>
+        * {
+            font-family: Helvetica, Arial, Tahoma, sans-serif;
+        }
+
+        body{
+            background-color: #212122;
+        }
+
+        div.container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 85vh;
+        }
+
+        #txtEmail,
+        #txtPassword {
+            padding: 8pt 0pt 8pt 0pt;
+            margin-bottom: 20pt;
+            width: 160pt;
+            background-color: transparent;
+            border: none;
+            border-bottom: 1.5px solid #055948;
+            outline: none;
+            font-weight: 550;
+            color: #353535;
+            font-size: 0.9rem;
+        }
+
+        #txtEmail::placeholder,
+        #txtPassword::placeholder{
+            color: #055948;
+            font-weight: 550;
+        }
+
+        #btnDangNhap {
+            font-size: 0.9rem;
+            font-weight: 520;
+            color: #fff;
+            padding: 8pt 20pt 8pt 20pt;
+            background-color: #055948;
+            border-radius: 0.8rem;
+            font-weight: 550;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        #btnDangNhap:hover {
+            background-color: #06836a;
+            outline: none;
+        }
+
+        #frmDangNhap {
+            display: block;
+            padding: 10pt 35pt 20pt 30pt;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 1rem;
+            border: 1px solid #055948;
+            animation-name: fade;
+            animation-duration: 0.5s;
+        }
+
+        @keyframes fade {
+            0%{
+                transform: scale(0.3);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form action="/login" method="POST" id="frmDangNhap">
+            <h2 style="color: #055948; margin-bottom: 20pt;">NOTE WORK</h2>
+            <i class="fa fa-user" style="color: #055948;"></i><span>&nbsp;&nbsp;</span>
+            <input name="email" type="email" id="txtEmail" placeholder="Email" required>
+            <br />
+            <i class="fa fa-unlock-alt" style="color: #055948;"></i><span>&nbsp;&nbsp;</span>
+            <input name="password" type="password" id="txtPassword" placeholder="Mật khẩu" required>
+            <br />
+            <button type="submit" id="btnDangNhap" style="margin-top: 10pt; margin-bottom: 10pt;">Đăng Nhập</button>
+        </form>
+    </div>
+</body>
+</html>

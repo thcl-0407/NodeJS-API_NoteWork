@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note Work</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script src="socket.io/socket.io.js"></script>
+
+    <style>
+        .item_note {
+            background: #CCEFE7;
+            border-radius: 1.6em;
+            padding-top: 10pt;
+            padding-left: 20pt;
+            padding-right: 20pt;
+            padding-bottom: 20pt;
+            width: 12em;
+            height: 6.2em;
+        }
+
+        .item_note:hover {
+            border: 1px solid #055948;
+            box-shadow: 2px 2px 12px lightgray;
+            cursor: pointer;
+        }
+
+        .item_note>span {
+            font-weight: 600;
+            color: #055948;
+            font-size: 1em;
+        }
+
+        #btnThemGhiChu {
+            border-radius: 20pt;
+            background-color: #055948;
+            padding-top: 0.6em;
+            padding-bottom: 0.6em;
+            padding-left: 1.6em;
+            padding-right: 1.6em;
+            color: #fff;
+        }
+
+        #btnThemGhiChu:hover {
+            text-decoration: none;
+            background-color: #09836a;
+        }
+
+        #navbar_top {
+            padding-top: 0.6em;
+            padding-bottom: 1em;
+        }
+
+        #title_name_app {
+            color: #055948;
+            font-size: 1.6rem;
+            font-weight: 650;
+        }
+
+        #title_name_app:hover {
+            text-decoration: none;
+        }
+
+        #etxtTitleNote {
+            border: none;
+            border-bottom: 2px solid #055948;
+            outline: none;
+            background: transparent;
+        }
+
+        #etxtTitleNote::placeholder {
+            color: #055948;
+        }
+
+        #content_note {
+            border: none;
+            background: transparent;
+            outline: none;
+            resize: none;
+        }
+
+        #content_note::placeholder {
+            color: #055948;
+        }
+
+        #btnHuyThemGhiChu {
+            border-radius: 20pt;
+            background-color: #8b2020;
+            color: #fff;
+            padding: 5pt 0;
+            border: none;
+        }
+
+        #btnLuuThemGhiChu {
+            border-radius: 20pt;
+            background-color: #055948;
+            color: #fff;
+            border: none;
+        }
+
+        #btnHuyThemGhiChu:hover {
+            background-color: #af2929;
+            cursor: pointer;
+        }
+
+        #btnLuuThemGhiChu:hover {
+            background-color: #09836a;
+            cursor: pointer;
+        }
+
+        #btnDangXuat{
+            padding: 0.6em 0.6em;
+        }
+
+        #btnDangXuat:focus{
+            background-color: #055948;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12" id="navbar_top">
+                <nav class="navbar navbar-expand-sm justify-content-between">
+                    <a href="/" id="title_name_app">NOTE WORK</a>
+
+                    <div class="dropdown">
+                        <button id="btnUserMenu" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true" 
+                        style="background-color: transparent; border: none; outline: none; cursor: pointer; margin-right: 2em; color: #055948; font-weight: 600;"><%= UserEmail %></button>
+                        <div class="dropdown-menu" style="padding: 0;" aria-labelledby="btnUserMenu">
+                            <a id="btnDangXuat" class="dropdown-item" href="/logout">Đăng Xuất</a>
+                        </div>
+                        <a href="/note/add" id="btnThemGhiChu" data-toggle="modal" data-target="#modalThemGhiChu">Tạo Ghi Chú</a>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <div class="row" style="padding-top: 1em;">
+            <table id="tblNote">
+                <% for (var i = 0; i < Notes.length; i++){ %>
+                <tr>
+                    <% while (i < Notes.length){%>
+                    <td>
+                        <div class="col-sm-12">
+                            <div class="item_note">
+                                <span><%= Notes[i].title %></span>
+                            </div>
+                        </div>
+                    </td>
+                    <% if ((i + 1) % 4 == 0) { break; } %>
+                    <% i++ }%>
+                </tr>
+                <% } %>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Thêm Ghi Chú -->
+    <div class="modal fade" id="modalThemGhiChu" aria-hidden="true" data-backdrop="static" data-keyboard="false"
+        style="padding: 0;">
+        <div class="modal-dialog">
+            <div class="modal-content"
+                style="text-align: left; padding-top: 0pt; border-radius: 10pt;">
+                <div
+                    style="border-radius: 10pt 10pt 0 0; display: flex; justify-self: end; align-items: center;  margin-bottom: 20pt; background-color: #055948; padding: 6px 0 6px 0;">
+                    <div style="float: left; width: 100%; padding-top: 5pt; text-align: center;">
+                        <h5 style="color: #f3f3f3; font-size: 14pt;">Tạo Ghi Chú</h5>
+                    </div>
+                </div>
+                <form method="POST" id="frmThemGhiChu" style="padding-left: 1.2rem; padding-right: 1.2rem;">
+                    <div style="text-align: left">
+                        <input type="text" placeholder="Nhập Tiêu Đề Ghi Chú" name="title" id="etxtTitleNote" required
+                            minlength="3" pattern="^(\s?[A-Z][a-z]+\s?)+$" style="width: 100%;">
+                    </div>
+                    <br />
+                    <textarea rows="12" cols="60" name="content" id="content_note"
+                        placeholder="Nhập Nội Dung Ghi Chú"></textarea>
+                    <br />
+                    <div style="text-align: end; margin-top: 10pt; margin-bottom: 30pt; padding-right: 15pt;">
+                        <button style="outline: none; border-radius: 0.5rem; padding-right:15pt; padding-left: 15pt;"
+                            type="button" style="outline: none;" data-dismiss="modal" aria-label="Close"
+                            id="btnHuyThemGhiChu">Huỷ</button>
+                        <button type="button" id="btnLuuThemGhiChu"
+                            style="border-radius: 0.5rem; width: 120px; padding: 5pt; outline: none;">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var socket = io("http://192.168.3.4:3000")
+</script>
+
+</html>

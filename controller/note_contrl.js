@@ -75,15 +75,15 @@ async function Login(User, CallBack){
             const isMatch = bcrypt.compareSync(User.password, result.recordset[0].password);
 
             if(isMatch){
-                CallBack(true)
+                CallBack(true, result.recordset[0])
             }else{
-                CallBack(false)
+                CallBack(false, null)
             }
         }else{
-            CallBack(false)
+            CallBack(false, null)
         }
     }catch{
-        CallBack(false)
+        CallBack(false, null)
     }
 }
 
