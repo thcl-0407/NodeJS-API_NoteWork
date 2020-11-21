@@ -26,7 +26,7 @@
             padding-right: 20pt;
             padding-bottom: 20pt;
             width: 12em;
-            height: 6.2em;
+            height: 8em;
         }
 
         .item_note:hover {
@@ -36,8 +36,8 @@
         }
 
         .item_note>span {
-            font-weight: 600;
-            color: #055948;
+            font-weight: 500;
+            color: #686868;
             font-size: 1em;
         }
 
@@ -118,11 +118,11 @@
             cursor: pointer;
         }
 
-        #btnDangXuat{
+        #btnDangXuat {
             padding: 0.6em 0.6em;
         }
 
-        #btnDangXuat:focus{
+        #btnDangXuat:focus {
             background-color: #055948;
         }
     </style>
@@ -136,13 +136,14 @@
                     <a href="/" id="title_name_app">NOTE WORK</a>
 
                     <div class="dropdown">
-                        <button id="btnUserMenu" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="true" 
-                        style="background-color: transparent; border: none; outline: none; cursor: pointer; margin-right: 2em; color: #055948; font-weight: 600;"><%= UserEmail %></button>
+                        <button id="btnUserMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
+                            style="background-color: transparent; border: none; outline: none; cursor: pointer; margin-right: 2em; color: #055948; font-weight: 600;"><%= UserEmail %></button>
+                        <span id="lbUserID" style="display: none;"><%= UserID %></span>
                         <div class="dropdown-menu" style="padding: 0;" aria-labelledby="btnUserMenu">
                             <a id="btnDangXuat" class="dropdown-item" href="/logout">Đăng Xuất</a>
                         </div>
-                        <a href="/note/add" id="btnThemGhiChu" data-toggle="modal" data-target="#modalThemGhiChu">Tạo Ghi Chú</a>
+                        <a href="/note/add" id="btnThemGhiChu" data-toggle="modal" data-target="#modalThemGhiChu">Tạo
+                            Ghi Chú</a>
                     </div>
                 </nav>
             </div>
@@ -153,13 +154,20 @@
                 <tr>
                     <% while (i < Notes.length){%>
                     <td>
-                        <div class="col-sm-12">
+                        <div class="col-sm-12" style="padding-bottom: 10pt;">
                             <div class="item_note">
-                                <span><%= Notes[i].title %></span>
+                                <span style="font-weight: 650; color: #055948;"><%= Notes[i].title %></span>
+                                </br>
+                                <% if(Notes[i].content_note.length < 20){ %>
+                                    <span><%= Notes[i].content_note + ". . ." %></span>
+                                <% } %>
+                                <% if(Notes[i].content_note.length > 20){ %>
+                                    <span><%= Notes[i].content_note.substring(0, 20) + ". . ." %></span>
+                                <% } %>
                             </div>
                         </div>
                     </td>
-                    <% if ((i + 1) % 4 == 0) { break; } %>
+                    <% if ((i + 1) % 5 == 0) { break; } %>
                     <% i++ }%>
                 </tr>
                 <% } %>
@@ -171,8 +179,7 @@
     <div class="modal fade" id="modalThemGhiChu" aria-hidden="true" data-backdrop="static" data-keyboard="false"
         style="padding: 0;">
         <div class="modal-dialog">
-            <div class="modal-content"
-                style="text-align: left; padding-top: 0pt; border-radius: 10pt;">
+            <div class="modal-content" style="text-align: left; padding-top: 0pt; border-radius: 10pt;">
                 <div
                     style="border-radius: 10pt 10pt 0 0; display: flex; justify-self: end; align-items: center;  margin-bottom: 20pt; background-color: #055948; padding: 6px 0 6px 0;">
                     <div style="float: left; width: 100%; padding-top: 5pt; text-align: center;">
@@ -184,8 +191,7 @@
                         <input type="text" placeholder="Nhập Tiêu Đề Ghi Chú" name="title" id="etxtTitleNote" required
                             minlength="3" pattern="^(\s?[A-Z][a-z]+\s?)+$" style="width: 100%;">
                     </div>
-                    <br />
-                    <textarea rows="12" cols="60" name="content" id="content_note"
+                    <textarea style="margin-top: 10pt;" rows="12" cols="60" name="content" id="content_note"
                         placeholder="Nhập Nội Dung Ghi Chú"></textarea>
                     <br />
                     <div style="text-align: end; margin-top: 10pt; margin-bottom: 30pt; padding-right: 15pt;">
@@ -202,6 +208,76 @@
 </body>
 <script>
     var socket = io("http://192.168.3.4:3000")
+
+    $(document).ready(() => {
+        let UserEmail = $("#btnUserMenu").text()
+
+        let InforConnect = {
+            UserEmail: UserEmail,
+            IntentCode: 999
+        }
+
+        socket.emit("InitTaskNote", InforConnect)
+    })
+
+    $('#btnLuuThemGhiChu').on('click', () => {
+        let UserID = $('#lbUserID').text()
+        let Title = $('#etxtTitleNote').val()
+        let Content = $('#content_note').val()
+
+        if (Title.trim() == "") {
+            alert("Chưa Nhập Tiêu Đề")
+        }
+
+        let data = {
+            title: Title,
+            content_note: Content,
+            user_id: UserID
+        }
+
+        $.ajax({
+            url: "/api/note/add",
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify(data),
+            success: function (res) {
+                if(res){
+                    window.location = "/"
+                }
+            },
+        });
+    })
+
+    $("#etxtTitleNote").keypress(() => {
+        let UserEmail = $("#btnUserMenu").text()
+        let UserID = $('#lbUserID').text()
+        let Title = $('#etxtTitleNote').val()
+
+        let TypingParrams = {
+            TitleContent: Title,
+            UserID: UserID,
+            UserEmail: UserEmail,
+            IntentCode: 999
+        }
+
+        socket.emit("UserTypingTitle", TypingParrams)
+    })
+
+    $("#content_note").keypress(() => {
+        let UserEmail = $("#btnUserMenu").text()
+        let UserID = $('#lbUserID').text()
+        let Content = $('#content_note').val()
+
+        let TypingParrams = {
+            ContentNote: Content,
+            UserID: UserID,
+            UserEmail: UserEmail,
+            IntentCode: 999
+        }
+
+        socket.emit("UserTypingContentNote", TypingParrams)
+    })
 </script>
 
 </html>
