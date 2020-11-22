@@ -142,7 +142,7 @@
                         <div class="dropdown-menu" style="padding: 0;" aria-labelledby="btnUserMenu">
                             <a id="btnDangXuat" class="dropdown-item" href="/logout">Đăng Xuất</a>
                         </div>
-                        <a href="/note/add" id="btnThemGhiChu" data-toggle="modal" data-target="#modalThemGhiChu">Tạo
+                        <a href="/note/add" id="btnThemGhiChu" data-toggle="modal" data-target="#modalThemGhiChu">+ Tạo
                             Ghi Chú</a>
                     </div>
                 </nav>
@@ -159,10 +159,10 @@
                                 <span style="font-weight: 650; color: #055948;"><%= Notes[i].title %></span>
                                 </br>
                                 <% if(Notes[i].content_note.length < 20){ %>
-                                    <span><%= Notes[i].content_note + ". . ." %></span>
+                                <span><%= Notes[i].content_note + ". . ." %></span>
                                 <% } %>
                                 <% if(Notes[i].content_note.length > 20){ %>
-                                    <span><%= Notes[i].content_note.substring(0, 20) + ". . ." %></span>
+                                <span><%= Notes[i].content_note.substring(0, 20) + ". . ." %></span>
                                 <% } %>
                             </div>
                         </div>
@@ -181,17 +181,21 @@
         <div class="modal-dialog">
             <div class="modal-content" style="text-align: left; padding-top: 0pt; border-radius: 10pt;">
                 <div
-                    style="border-radius: 10pt 10pt 0 0; display: flex; justify-self: end; align-items: center;  margin-bottom: 20pt; background-color: #055948; padding: 6px 0 6px 0;">
+                    style="border-radius: 10pt 10pt 0 0; display: flex; justify-self: end; align-items: center; background-color: #055948; padding: 6px 0 6px 0;">
                     <div style="float: left; width: 100%; padding-top: 5pt; text-align: center;">
                         <h5 style="color: #f3f3f3; font-size: 14pt;">Tạo Ghi Chú</h5>
                     </div>
+                </div>
+                <div style="padding: 1em 1em 1em 0; width: 100%; text-align: right;">
+                    <button id="btnDongBo" 
+                            style="outline: none; border: none; background-color: blue; border-radius: 2em; color: #fff; padding: 0.5em 1.2em; cursor: pointer;">Đồng Bộ</button>
                 </div>
                 <form method="POST" id="frmThemGhiChu" style="padding-left: 1.2rem; padding-right: 1.2rem;">
                     <div style="text-align: left">
                         <input type="text" placeholder="Nhập Tiêu Đề Ghi Chú" name="title" id="etxtTitleNote" required
                             minlength="3" pattern="^(\s?[A-Z][a-z]+\s?)+$" style="width: 100%;">
                     </div>
-                    <textarea style="margin-top: 10pt;" rows="12" cols="60" name="content" id="content_note"
+                    <textarea style="margin-top: 10pt;" rows="15" cols="60" name="content" id="content_note"
                         placeholder="Nhập Nội Dung Ghi Chú"></textarea>
                     <br />
                     <div style="text-align: end; margin-top: 10pt; margin-bottom: 30pt; padding-right: 15pt;">
@@ -207,23 +211,71 @@
     </div>
 </body>
 <script>
-    var socket = io("http://192.168.3.4:3000")
+    var SyncTitle = ""
+    var SyncContent = ""
+
+    var socket = io("http://54.179.131.22:3000")
 
     $(document).ready(() => {
         let UserEmail = $("#btnUserMenu").text()
 
         let InforConnect = {
             UserEmail: UserEmail,
-            IntentCode: 999
         }
 
         socket.emit("InitTaskNote", InforConnect)
+
+        //Cập Nhật Danh Sách Khi Xoá Ghi Chú
+        socket.on("CapNhatDanhSachGhiChuXoa", (ServerRespone)=>{
+            window.location = "/"
+        })
+
+        //Cập Nhật Danh Sách Khi Thêm Mới Ghi Chú
+        socket.on("CapNhatDanhSachGhiChuThem", (ServerRespone)=>{
+            window.location = "/"
+        })
+
+        //Cập Nhật Tiêu Đề Ghi Chú
+        socket.on("CapNhatTypingTitle", (ServerRespone)=>{
+            SyncTitle = ServerRespone.Title
+        })
+
+        //Cập Nhật Nội Dung Ghi Chú
+        socket.on("CapNhatTypingContentNote", (ServerRespone)=>{
+            SyncContent = ServerRespone.Content
+        })
+
+        //Cập Nhật Lại Form Khi Người Dùng Huỷ Ghi Chú
+        socket.on("CapNhatHuyGhiChu", (ServerRespone)=>{
+            $('#etxtTitleNote').val("")
+            $('#content_note').val("")
+        })
     })
 
+    //Đồng Bộ Nội Dung Ghi Chú
+    $("#btnDongBo").on("click", ()=>{
+        $('#etxtTitleNote').val(SyncTitle)
+        $('#content_note').val(SyncContent)
+    })
+
+    //Mở Form Thêm Ghi Chú
+    $("#btnThemGhiChu").on("click", ()=>{
+        let UserEmail = $("#btnUserMenu").text()
+
+        let data = {
+            UserEmail: UserEmail,
+            Device: "Website"
+        }
+
+        socket.emit("ClientDangTaoMoiGhiChu", data)
+    })
+
+    //Lưu Ghi Chú
     $('#btnLuuThemGhiChu').on('click', () => {
         let UserID = $('#lbUserID').text()
         let Title = $('#etxtTitleNote').val()
         let Content = $('#content_note').val()
+        let UserEmail = $("#btnUserMenu").text()
 
         if (Title.trim() == "") {
             alert("Chưa Nhập Tiêu Đề")
@@ -243,14 +295,23 @@
             contentType: "application/json;charset=utf-8",
             data: JSON.stringify(data),
             success: function (res) {
-                if(res){
-                    window.location = "/"
+                if (res) {
+
+                    console.log(res)
+
+                    let InforConnect = {
+                        UserEmail: UserEmail,
+                    }
+
+                    socket.emit("ThemMoiGhiChuClient", InforConnect)
+
+                    window.location = '/'
                 }
             },
         });
     })
 
-    $("#etxtTitleNote").keypress(() => {
+    $("#etxtTitleNote").change(() => {
         let UserEmail = $("#btnUserMenu").text()
         let UserID = $('#lbUserID').text()
         let Title = $('#etxtTitleNote').val()
@@ -259,10 +320,11 @@
             TitleContent: Title,
             UserID: UserID,
             UserEmail: UserEmail,
-            IntentCode: 999
+            IntentCode: 999,
+            Device: "Website"
         }
 
-        socket.emit("UserTypingTitle", TypingParrams)
+        socket.emit("UserTypingCreateTitle", TypingParrams)
     })
 
     $("#content_note").keypress(() => {
@@ -274,10 +336,11 @@
             ContentNote: Content,
             UserID: UserID,
             UserEmail: UserEmail,
-            IntentCode: 999
+            IntentCode: 999,
+            Device: "Website"
         }
 
-        socket.emit("UserTypingContentNote", TypingParrams)
+        socket.emit("UserTypingCreateContentNote", TypingParrams)
     })
 </script>
 

@@ -79,20 +79,55 @@ app.get("/logout", (req, res)=>{
 app.use('/api', route.GetUserbyId)
 
 io.sockets.on('connection',  (socket)=>{
-    console.log('Có Người Kết Nối ' + socket.id)
 
     socket.on('InitTaskNote', (InforConnect)=>{
         socket.join(InforConnect.UserEmail)
         socket.UserEmail = InforConnect.UserEmail
         socket.IntentCode = InforConnect.IntentCode;
+
+        console.log("Người Mới Kết Nối: " + socket.UserEmail)
     })
 
-    socket.on('UserTypingTitle', (TypingParrams)=>{
-        console.log(TypingParrams.TitleContent)
+    //Lắng Nghe Người Dùng Đang Tạo Ghi Chú
+    socket.on('ClientDangTaoMoiGhiChu', (InforConnect)=>{
+        console.log("Đang Tạo Mới Ghi Chú: " + InforConnect.UserEmail + " " + InforConnect.Device)
+
+        socket.on('UserTypingCreateTitle', (TypingParrams)=>{
+            console.log("Cập Nhật Tiêu Đề Mới: " + InforConnect.UserEmail + " " +TypingParrams.Device)
+
+            socket.broadcast.to(InforConnect.UserEmail).emit("CapNhatTypingTitle", {
+                Device: InforConnect.Device,
+                Title: TypingParrams.TitleContent
+            })
+        })
+    
+        socket.on('UserTypingCreateContentNote', (TypingParrams)=>{
+            console.log("Cập Nhật Nội Dung Mới: " + InforConnect.UserEmail)
+
+            socket.broadcast.to(InforConnect.UserEmail).emit("CapNhatTypingContentNote", {
+                Device: InforConnect.Device,
+                Content: TypingParrams.ContentNote
+            })
+        })
     })
 
-    socket.on('UserTypingContentNote', (TypingParrams)=>{
-        console.log(TypingParrams.ContentNote)
+    //Lắng Nghe Người Dùng Huỷ Ghi Chú
+    socket.on("ClientHuyGhiChu", (InforConnect)=>{
+        console.log("Huỷ Ghi Chú: " + InforConnect.UserEmail)
+
+        if(InforConnect.IntentCode == 999){
+            socket.broadcast.to(InforConnect.UserEmail).emit("CapNhatHuyGhiChu", InforConnect)
+        }
+    })
+
+    socket.on('ThemMoiGhiChuClient', (InforConnect)=>{
+        console.log("Thêm Ghi Chú: " + InforConnect.UserEmail)
+        socket.broadcast.to(InforConnect.UserEmail).emit('CapNhatDanhSachGhiChuThem', InforConnect)
+    })
+
+    socket.on('XoaGhiChuClient', (InforConnect)=>{
+        console.log("Xoá Ghi Chú: " + InforConnect.UserEmail)
+        socket.broadcast.to(InforConnect.UserEmail).emit('CapNhatDanhSachGhiChuXoa', InforConnect)
     })
 })
 
