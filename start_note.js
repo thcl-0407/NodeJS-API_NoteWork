@@ -54,15 +54,11 @@ app.post("/login", (req, res)=>{
 app.get("/", (req, res)=>{
     if(req.session.UserEmail){
         note_ctrl.GetNoteByUserId(req.session.UserID, (result, data)=>{
-            if(result){
-                res.render('note', {
-                    Notes: data,
-                    UserEmail: req.session.UserEmail,
-                    UserID: req.session.UserID
-                })
-            }else{
-                res.render('error')
-            }
+            res.render('note', {
+                Notes: data,
+                UserEmail: req.session.UserEmail,
+                UserID: req.session.UserID
+            })
         })
     }else{
         res.redirect('/login')

@@ -150,6 +150,7 @@
         </div>
         <div class="row" style="padding-top: 1em;">
             <table id="tblNote">
+                <% if(Notes){%>
                 <% for (var i = 0; i < Notes.length; i++){ %>
                 <tr>
                     <% while (i < Notes.length){%>
@@ -170,7 +171,7 @@
                     <% if ((i + 1) % 5 == 0) { break; } %>
                     <% i++ }%>
                 </tr>
-                <% } %>
+                <% } } %>
             </table>
         </div>
     </div>
