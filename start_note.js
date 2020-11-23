@@ -43,9 +43,10 @@ app.post("/login", (req, res)=>{
             req.session.UserEmail = data.email
             req.session.UserID = data.user_id
 
+            res.send(true)
             res.redirect("/")
         }else{
-            res.redirect("login")
+            res.send(false)
         }
     })
 })

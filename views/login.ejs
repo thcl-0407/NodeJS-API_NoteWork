@@ -5,13 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
     <title>Note Work</title>
     <style>
         * {
             font-family: Helvetica, Arial, Tahoma, sans-serif;
         }
 
-        body{
+        body {
             background-color: #212122;
         }
 
@@ -37,7 +46,7 @@
         }
 
         #txtEmail::placeholder,
-        #txtPassword::placeholder{
+        #txtPassword::placeholder {
             color: #055948;
             font-weight: 550;
         }
@@ -60,9 +69,17 @@
             outline: none;
         }
 
+        #btnTatThongBao{
+            border: none;
+            background-color: #055948;
+            outline: none;
+            padding: 5pt;
+            color: #fff;
+        }
+
         #frmDangNhap {
             display: block;
-            padding: 10pt 35pt 20pt 30pt;
+            padding: 22pt 35pt 20pt 30pt;
             text-align: center;
             background: rgba(255, 255, 255, 0.9);
             border-radius: 1rem;
@@ -72,7 +89,7 @@
         }
 
         @keyframes fade {
-            0%{
+            0% {
                 transform: scale(0.3);
             }
         }
@@ -82,15 +99,69 @@
 <body>
     <div class="container">
         <form action="/login" method="POST" id="frmDangNhap">
-            <h2 style="color: #055948; margin-bottom: 20pt;">NOTE WORK</h2>
+            <h2 style="color: #055948; margin-bottom: 20pt; font-weight: 600">Note Work</h2>
             <i class="fa fa-user" style="color: #055948;"></i><span>&nbsp;&nbsp;</span>
             <input name="email" type="email" id="txtEmail" placeholder="Email" required>
             <br />
             <i class="fa fa-unlock-alt" style="color: #055948;"></i><span>&nbsp;&nbsp;</span>
             <input name="password" type="password" id="txtPassword" placeholder="Mật khẩu" required>
             <br />
-            <button type="submit" id="btnDangNhap" style="margin-top: 10pt; margin-bottom: 10pt;">Đăng Nhập</button>
+            <button type="button" id="btnDangNhap" style="margin-top: 10pt; margin-bottom: 10pt;">Đăng Nhập</button>
         </form>
+
+        <!-- Modal Thông Báo -->
+    <div class="modal fade" id="modalThongBao" aria-hidden="true" data-backdrop="static" data-keyboard="false"
+        style="padding: 0;">
+        <div class="modal-dialog">
+            <div class="modal-content" style="text-align: left; padding-top: 0pt; border-radius: 10pt;">
+                <div
+                    style="border-radius: 10pt 10pt 0 0; display: flex; justify-self: end; align-items: center; background-color: #055948; padding: 6px 0 6px 0;">
+                    <div style="float: left; width: 100%; padding-top: 5pt; text-align: center;">
+                        <h5 style="color: #f3f3f3; font-size: 18pt; font-weight: 600">Thông Báo</h5>
+                    </div>
+                </div>
+                <form method="POST" id="frmThemGhiChu" style="padding-left: 1.2rem; padding-right: 1.2rem;">
+                    <div style="text-align: center; margin-top: 20pt; justify-content: center; display: flex; align-items: center;">
+                        <i class="fa fa-close" style="font-size:32pt; color:red; margin-right: 8pt;"></i>
+                        <h5 style="font-size: 16pt; font-weight: 550; margin-top: 8pt;">Đăng Nhập Thất Bại</h5>
+                    </div>
+                    <br />
+                    <div style="text-align: end; margin-bottom: 30pt; padding-right: 15pt;">
+                        <button style="outline: none; border-radius: 0.5rem; padding-right:15pt; padding-left: 15pt;"
+                            type="button" style="outline: none; border: none; font-weight: 550;" data-dismiss="modal" aria-label="Close"
+                            id="btnTatThongBao">Thử Lại</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+    </div>
+    <script>
+        $("#btnDangNhap").on("click", () => {
+            let Email = $("#txtEmail").val()
+            let Pass = $("#txtPassword").val()
+
+            let data = {
+                email: Email,
+                password: Pass
+            }
+
+            $.ajax({
+                url: "/login",
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify(data),
+                success: function (res) {
+                    if (!res) {
+                       $("#modalThongBao").modal("show")
+                    }else{
+                        window.location = "/"
+                    }
+                },
+            });
+        })
+    </script>
 </body>
+
 </html>
